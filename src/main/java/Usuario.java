@@ -12,6 +12,10 @@ class Usuario {
         this.moderador = false;
     }
 
+    public Usuario(String s) {
+        this.nome = s;
+    }
+
     public String getNome() {
         return nome;
     }
@@ -26,5 +30,9 @@ class Usuario {
 
     public boolean isModerador() {
         return moderador;
+    }
+
+    public String toString() {
+        return "Usuário " + nome + " Pontos " + pontos;
     }
 }
