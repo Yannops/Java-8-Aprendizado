@@ -1,12 +1,23 @@
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import static java.nio.file.Files.lines;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public class Capitulo7 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Usuario usuario = new Usuario("yann", 70);
         Usuario usuario2 = new Usuario("fillipe", 90);
 
@@ -38,7 +49,7 @@ public class Capitulo7 {
         List<Usuario> listaFiltrada2 = usuarios.stream().filter(u -> u.getPontos() > 68).collect(toList());
         listaFiltrada2.forEach(System.out::println);
 
-        Set<Usuario> lista = usuarios.stream().filter(u -> u.getPontos()).collect(Collectors.toSet());
+        Set<Usuario> lista = usuarios.stream().filter(u -> u.getPontos() > 80).collect(Collectors.toSet());
 
         Set<Usuario> lista2 = stream.collect(Collectors.toCollection(HashSet::new));
 
@@ -71,7 +82,7 @@ public class Capitulo7 {
                 .collect(toList());
 
         Optional<Usuario> qualquerusuariocommaisde80pontos = usuarios.stream().filter(u -> u.getPontos() > 80)
-        .findAny();
+                .findAny();
 
         Optional<Usuario> primeirousuariocommaisde80pontos = usuarios.stream().filter(u -> u.getPontos() > 80)
                 .findFirst();
@@ -84,7 +95,7 @@ public class Capitulo7 {
         //sua operação terminal mande que ela encerre antes usando por exemplo o findAny ou findFirst
         usuarios.stream().sorted(Comparator.comparing(Usuario::getNome)).peek(System.out::println).findAny();
 
-        Optional<Usuario> maiorpontuacao = usuarios.stream().max(Comparator.comparingInt(Usuario::getPontos));
+        Optional<Usuario> maiorpontuacao2 = usuarios.stream().max(Comparator.comparingInt(Usuario::getPontos));
         Usuario maximapontuacao = maiorpontuacao.get();
 
         int somadospontos = usuarios.stream().mapToInt(Usuario::getPontos).sum();
@@ -92,11 +103,173 @@ public class Capitulo7 {
         int totalpontos = usuarios.stream().mapToInt(Usuario::getPontos).reduce(0, (a, b) -> a + b);
         int totalpontos2 = usuarios.stream().mapToInt(Usuario::getPontos).reduce(0, Integer::sum);
         int multiplicapontos = usuarios.stream().mapToInt(Usuario::getPontos).reduce(0, (a, b) -> a * b);
-        int multiplicapontos = usuarios.stream().mapToDouble(Usuario::getPontos).reduce(0, (a, b) -> a / b);
+        int multiplicapontos2 = usuarios.stream().mapToInt(Usuario::getPontos).reduce(0, (a, b) -> a / b);
 
         //operação de soma sem o map
         int somapontos = usuarios.stream().reduce(0, (atual, u) -> atual + u.getPontos(), Integer::sum);
 
+        Iterator<Usuario> i = usuarios.stream().iterator();
+
+        usuarios.stream().iterator().forEachRemaining(System.out::println);
+
+        boolean possuimoderador = usuarios.stream().anyMatch(Usuario::isModerador);
+
+        Random randomnumbers = new Random(0);
+        Supplier<Integer> supplier = () -> randomnumbers.nextInt();
+        Stream<Integer> stream2 = Stream.generate(supplier);
+
+        //Sempre utilizar operações de curto-circuito em streams deste tipo!!!, caso contrario, a operação nunca será
+        //finalizada.
+        Random randomnumbers2 = new Random(0);
+        IntStream stream3 = IntStream.generate(() -> randomnumbers2.nextInt());
+        //correto... pois desse modo limitamos a stream e assim a operação pode ser finalizada!!!
+        List<Integer> numerosinteiros = stream3.limit(100).boxed().collect(toList());
+
+        IntStream.generate(new Fibonacci()).limit(10).forEach(System.out::println);
+
+        //pegando o primeiro numero maior que 100
+        int maiorque100 = IntStream.generate(new Fibonacci()).filter(f -> f > 100).findFirst().getAsInt();
+
+        System.out.println(maiorque100);
+
+        IntStream.iterate(0, x -> x + 1).limit(10).forEach(System.out::println);
+
+        Files.list(Paths.get("./src/main/java")).forEach(System.out::println);
+
+        Files.list(Paths.get("./src/main/java")).filter(p -> p.toString().endsWith(".java")).map(p -> {
+            try {
+                return lines(p);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        })
+                .forEach(System.out::println);
+
+        Stream<Stream<String>> strings = Files.list(Paths.get("./src/main/java")).filter(p -> p.toString().endsWith(".java"))
+                .map(p -> {
+                    try {
+                        return lines(p);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+
+        Stream<String> strings2 = Files.list(Paths.get("./src/main/java")).filter(p -> p.toString().endsWith(".java"))
+                .flatMap(p -> {
+                    try {
+                        return lines(p);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+
+
+        IntStream chars = Files.list(Paths.get("./src/main/java")).filter(p -> p.toString().endsWith(".java"))
+                .flatMap(p -> {
+                    try {
+                        return lines(p);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }).flatMapToInt((String s) -> s.chars());
+
+
+        Grupo englishSpeakers = new Grupo();
+        englishSpeakers.add(usuario);
+        englishSpeakers.add(usuario2);
+        Grupo spanishSpeakers = new Grupo();
+        spanishSpeakers.add(usuario2);
+        spanishSpeakers.add(usuario);
+
+        List<Grupo> grupos = Arrays.asList(englishSpeakers, spanishSpeakers);
+
+        grupos.stream().flatMap(g -> g.getUsuarios().stream()).forEach(System.out::println);
+
+        List<Long> linhas = Files.list(Paths.get("./src/main/java")).filter(p -> p.toString().endsWith(".java"))
+                .map(p -> {
+                    try {
+                        return lines(p).count();
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }).collect(toList());
+
+        Map<Path, Long> linhasporarquivo = new HashMap<>();
+        Files.list(Paths.get("./src/main/java")).filter(p -> p.toString().endsWith(".java"))
+                .forEach(p -> {
+                    try {
+                        linhasporarquivo.put(p, lines(p).count());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+        System.out.println(linhasporarquivo);
+
+        Map<Path, Long> linhas2 = Files.list(Paths.get("./src/main/java")).filter(p -> p.toString().endsWith(".java"))
+                .collect(toMap(p -> p, p -> {
+                    try {
+                        return lines(p).count();
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }));
+
+        System.out.println(linhas2);
+
+        Map<Path, List<String>> conteudo = Files.list(Paths.get("./src/main/java")).filter(p -> p.toString().endsWith(".java"))
+                .collect(toMap(Function.identity(), p -> {
+                    try {
+                        return lines(p).collect(toList());
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }));
+
+        Map<String, Usuario> nomesdosusuarios = usuarios.stream().collect(toMap(Usuario::getNome, Function.identity()));
+
+        Usuario usuario1 = new Usuario("Yann", 60);
+        Usuario usuario3 = new Usuario("sergio", 90);
+        Usuario usuario4 = new Usuario("fillipe", 40);
+        Usuario usuario5 = new Usuario("kaique", 70);
+        Usuario usuario6 = new Usuario("roger", 80);
+
+        List<Usuario> alunosfatec = Arrays.asList(usuario1, usuario3, usuario4, usuario5, usuario6);
+
+        Map<Integer, List<Usuario>> pontuacao = new HashMap<>();
+
+        for (Usuario u : alunosfatec) {
+            if (!pontuacao.containsKey(u.getPontos())) {
+                pontuacao.put(u.getPontos(), new ArrayList<>());
+            }
+            pontuacao.get(u.getPontos()).add(u);
+        }
+
+        System.out.println(pontuacao);
+
+        Map<Integer, List<Usuario>> pontuacao2 = new HashMap<>();
+
+        for (Usuario u: alunosfatec) {
+            pontuacao.computeIfAbsent(u.getPontos(), user -> new ArrayList<>()).add(u);
+        }
+
+        System.out.println(pontuacao2);
+
+        Map<Integer, List<Usuario>> pontuacao3 = alunosfatec.stream().collect(Collectors.groupingBy(Usuario::getPontos));
+
+        Map<Boolean, List<Usuario>> moderadoresenaomoderadores = alunosfatec.stream().collect(Collectors.partitioningBy(Usuario::isModerador));
+
+        Map<Boolean, List<String>> nomesalunosportipo = alunosfatec.stream().collect(Collectors.partitioningBy(Usuario::isModerador,
+                Collectors.mapping(Usuario::getNome, Collectors.toList())));
+
+        Map<Boolean, Integer> pontuacaoportipo = alunosfatec.stream().collect(Collectors.partitioningBy(Usuario::isModerador,
+                Collectors.summingInt(Usuario::getPontos)));
+
+        System.out.println(pontuacaoportipo);
+
+        String nomesjuntos = alunosfatec.stream().map(Usuario::getNome).collect(Collectors.joining(", "));
+
         
+
     }
 }
