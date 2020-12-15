@@ -4,6 +4,10 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -249,7 +253,7 @@ public class Capitulo7 {
 
         Map<Integer, List<Usuario>> pontuacao2 = new HashMap<>();
 
-        for (Usuario u: alunosfatec) {
+        for (Usuario u : alunosfatec) {
             pontuacao.computeIfAbsent(u.getPontos(), user -> new ArrayList<>()).add(u);
         }
 
@@ -268,6 +272,104 @@ public class Capitulo7 {
         System.out.println(pontuacaoportipo);
 
         String nomesjuntos = alunosfatec.stream().map(Usuario::getNome).collect(Collectors.joining(", "));
+
+
+        List<Usuario> filtrareordenar = usuarios.stream().filter(p -> p.getPontos() > 100)
+                .sorted(Comparator.comparing(Usuario::getNome))
+                .collect(toList());
+
+        List<Usuario> filtrareordenar2 = usuarios.parallelStream().filter(p -> p.getPontos() > 100)
+                .sorted(Comparator.comparing(Usuario::getNome))
+                .collect(toList());
+
+        long sum = LongStream.range(0, 10000000).parallel().filter(x -> x % 2 == 0).sum();
+
+        System.out.println(sum);
+
+        //maneira antiga de adicionar 1 mês a partir da data atual.
+        Calendar mesquevem = Calendar.getInstance();
+        mesquevem.add(Calendar.MONTH, 1);
+
+        //maneira atual de adicionar 1 mês a partir da data atual.
+        LocalDate mesquevem2 = LocalDate.now().plusMonths(1);
+        LocalDate menosumano = LocalDate.now().minusYears(1);
+
+        LocalTime agora = LocalTime.now();
+        LocalDate hoje = LocalDate.now();
+        LocalDateTime dataehora = hoje.atTime(agora);
+
+        ZonedDateTime datacomhora = dataehora.atZone(ZoneId.of("America/Sao_Paulo"));
+
+        LocalDateTime semtimezone = datacomhora.toLocalDateTime();
+
+        LocalDate data = LocalDate.of(2014,12,25);
+        LocalDateTime horario = LocalDateTime.of(2014, 12, 25, 10, 30);
+
+        LocalDate anopassado = LocalDate.now().withYear(2000);
+
+        LocalDate anopassado2 = LocalDate.now().withYear(1998);
+        System.out.println(anopassado2.getYear());
+
+        LocalDate hoje2 = LocalDate.now();
+        LocalDate amanha = LocalDate.now().plusDays(1);
+        System.out.println(hoje2.isBefore(amanha));
+        System.out.println(hoje2.isAfter(amanha));
+        System.out.println(hoje2.isEqual(amanha));
+
+        ZonedDateTime tokyo = ZonedDateTime.of(2011, 5, 2, 10, 30, 0, 0, ZoneId.of("Asia/Tokyo"));
+        ZonedDateTime saoPaulo = ZonedDateTime.of(2011, 5, 2, 10, 30, 0, 0, ZoneId.of("America/Sao_Paulo"));
+        tokyo = tokyo.plusHours(12);
+        System.out.println(tokyo.isEqual(saoPaulo));
+
+        System.out.println("Hoje é dia " + MonthDay.now().getDayOfMonth());
+        YearMonth ym = YearMonth.from(data);
+        System.out.println(ym.getMonth() + " " + ym.getYear());
+
+        System.out.println(Month.DECEMBER.firstMonthOfQuarter());
+        System.out.println(Month.DECEMBER.plus(2));
+        System.out.println(Month.DECEMBER.minus(1));
+
+        Locale lc = new Locale("pt");
+
+        System.out.println(Month.DECEMBER.getDisplayName(TextStyle.FULL, lc));
+        //SAIDA: Dezembro
+        System.out.println(Month.DECEMBER.getDisplayName(TextStyle.SHORT, lc));
+        //SAIDA: Dez
+
+        LocalDateTime agora1 = LocalDateTime.now();
+        String resultado = agora1.format(DateTimeFormatter.ISO_LOCAL_TIME);
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        String resultado3 = agora1.format(formatador);
+        LocalDate agoraemdata = LocalDate.parse(resultado3, formatador);
+
+        LocalDate dataqualquer = LocalDate.of(1989, Month.JANUARY, 25);
+        long dias = ChronoUnit.DAYS.between(dataqualquer, agora1);
+        long meses = ChronoUnit.MONTHS.between(dataqualquer, agora1);
+        long anos = ChronoUnit.YEARS.between(dataqualquer, agora1);
+
+
+        Period periodo = Period.between(dataqualquer, agora1);
+        System.out.println(periodo.getDays() + " " + periodo.getMonths() + " " + periodo.getYears());
+
+        if (periodo.isNegative()) {
+            periodo = periodo.negated();
+        }
+
+        System.out.println(periodo.getDays() + " " + periodo.getMonths() + " " + periodo.getYears());
+
+        Period periodo2 = Period.of(5, 4, 1);
+
+        LocalDateTime agora4 = LocalDateTime.now();
+        LocalDateTime daquiumahora = LocalDateTime.now().plusHours(1);
+
+        Duration duration = Duration.between(agora4, daquiumahora);
+
+        if (duration.isNegative()) {
+            duration = duration.negated();
+        }
+
+        System.out.println(duration.toHours() + " " + duration.toMinutes() + " " + duration.getSeconds());
 
         
 
