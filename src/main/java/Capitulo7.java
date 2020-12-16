@@ -316,8 +316,10 @@ public class Capitulo7 {
         System.out.println(hoje2.isAfter(amanha));
         System.out.println(hoje2.isEqual(amanha));
 
-        ZonedDateTime tokyo = ZonedDateTime.of(2011, 5, 2, 10, 30, 0, 0, ZoneId.of("Asia/Tokyo"));
-        ZonedDateTime saoPaulo = ZonedDateTime.of(2011, 5, 2, 10, 30, 0, 0, ZoneId.of("America/Sao_Paulo"));
+        ZonedDateTime tokyo = ZonedDateTime.of(2011, 5, 2, 10,
+                30, 0, 0, ZoneId.of("Asia/Tokyo"));
+        ZonedDateTime saoPaulo = ZonedDateTime.of(2011, 5, 2, 10,
+                30, 0, 0, ZoneId.of("America/Sao_Paulo"));
         tokyo = tokyo.plusHours(12);
         System.out.println(tokyo.isEqual(saoPaulo));
 
@@ -349,7 +351,7 @@ public class Capitulo7 {
         long anos = ChronoUnit.YEARS.between(dataqualquer, agora1);
 
 
-        Period periodo = Period.between(dataqualquer, agora1);
+        Period periodo = Period.between(dataqualquer, hoje2);
         System.out.println(periodo.getDays() + " " + periodo.getMonths() + " " + periodo.getYears());
 
         if (periodo.isNegative()) {
