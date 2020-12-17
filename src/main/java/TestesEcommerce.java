@@ -1,3 +1,4 @@
+import ecommerceexemplo.Assinatura;
 import ecommerceexemplo.Customer;
 import ecommerceexemplo.Payment;
 import ecommerceexemplo.Produto;
@@ -6,6 +7,8 @@ import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,8 +22,6 @@ import static java.util.stream.Collectors.reducing;
 
 public class TestesEcommerce {
     public static void main(String[] args) {
-
-
         Customer paulo = new Customer("Paulo Cesar");
         Customer yann = new Customer("Yann Silveira");
         Customer igor = new Customer("Igor Labras");
@@ -114,6 +115,25 @@ public class TestesEcommerce {
 
         totalvalorporcliente.entrySet().stream().sorted(comparing(Map.Entry::getValue)).forEach(System.out::println);
 
-        
+        Map<YearMonth, List<Payment>> pagamentospormes = pagamentos.stream().collect(groupingBy(p ->
+                YearMonth.from(p.getData())));
+        pagamentospormes.entrySet().stream().forEach(System.out::println);
+
+        BigDecimal mesGratis = new BigDecimal("99.90");
+
+        Assinatura a1 = new Assinatura(mesGratis, ontem.minusMonths(5), paulo);
+        Assinatura a2 = new Assinatura(mesGratis, ontem.minusMonths(8), hoje.minusMonths(1), yann);
+        Assinatura a3 = new Assinatura(mesGratis, ontem.minusMonths(5), hoje.minusMonths(2), igor);
+
+        List<Assinatura> assinaturas = Arrays.asList(a1, a2, a3);
+
+        long meses = ChronoUnit.MONTHS.between(a1.getInicio(), LocalDateTime.now());
+        long meses2 = ChronoUnit.MONTHS.between(a1.getInicio(), a1.getFim().orElse(LocalDateTime.now()));
+
+        BigDecimal totalmeses = a1.getMesGratis().multiply(new BigDecimal(ChronoUnit.MONTHS
+                .between(a1.getInicio(), a1.getFim().orElse(LocalDateTime.now()))));
+
+        BigDecimal totalpago = assinaturas.stream().map(Assinatura::getTotalPaid).reduce(BigDecimal.ZERO,
+                BigDecimal::add);
     }
 }

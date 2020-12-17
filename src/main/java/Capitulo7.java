@@ -373,7 +373,8 @@ public class Capitulo7 {
 
         System.out.println(duration.toHours() + " " + duration.toMinutes() + " " + duration.getSeconds());
 
-        
+        usuarios.sort(Comparator.comparingInt(Usuario::getPontos).thenComparing(Usuario::getNome));
+        usuarios.sort(Comparator.comparingInt((Usuario p) -> p.getPontos()).thenComparing(u -> u.getPontos()));
 
     }
 }
