@@ -1,17 +1,11 @@
 package pagamentos;
 
-import ecommerceexemplo.Payment;
-import ecommerceexemplo.Produto;
-import org.w3c.dom.ls.LSOutput;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.Function;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
 
 public class mainPagamentos {
     public static void main(String[] args) {
@@ -25,6 +19,7 @@ public class mainPagamentos {
 
 
         //escrever o nome de cada cliente no console, deve ser feito em java 8 e anterior a ele
+        System.out.println("\n");
         for (Pagamento pagamento: pagamentos) {
             System.out.println(pagamento.getNomeCliente());
         }
@@ -36,7 +31,7 @@ public class mainPagamentos {
         System.out.println("\n");
         pagamentos.stream().filter(c -> c.getValor().compareTo(new BigDecimal("100")) > 0) .forEach(System.out::println);
 
-        //escreva uma finção que ordene a lista por data de pagamento e gere uma nova lista ordenada, print essa lista ordenada.
+        //escreva uma função que ordene a lista por data de pagamento e gere uma nova lista ordenada, print essa lista ordenada.
         System.out.println("\n");
         List<Pagamento> pagamentos1 = pagamentos.stream().sorted(Comparator.comparing(Pagamento::getData)).collect(Collectors.toList());
         pagamentos1.stream().forEach(System.out::println);
@@ -46,6 +41,6 @@ public class mainPagamentos {
         pagamentos.stream().map(p -> p.getValor()).reduce(BigDecimal::add).ifPresent(System.out::println);
 
         //escreva uma função que agrupe os pagamentos em um mapa por nome do cliente e em seguida calcule a soma dos pagamentos de cada um dos clientes, printe o nome e o valor total dos pagamentos
-        
+
     }
 }
